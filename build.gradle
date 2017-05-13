@@ -21,3 +21,15 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
+
+subprojects {
+    ext.global_compileSdkVersion = COMPILE_SDK_VERSION.toInteger()
+    ext.global_buildToolsVersion = "${BUILD_TOOLS_VERSION}"
+    ext.global_abiFilters = ["armeabi-v7a", "armeabi", "arm64-v8a", "x86", "x86_64", "mips", "mips64"] as String[]
+    ext.global_debug_abiFilters = ["armeabi"] as String[]
+    ext.global_cFlags = ["-fpic", "-fexceptions", "-frtti"] as String[]
+    ext.global_cppFlags = ["-fpic", "-fexceptions", "-frtti"] as String[]
+    ext.global_arguments = ["-DANDROID_STL=c++_static", "-DANDROID_PLATFORM=android-14"] as String[]
+}
