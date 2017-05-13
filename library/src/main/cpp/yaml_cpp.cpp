@@ -3,18 +3,25 @@
 //
 
 #include "yaml_cpp.h"
+#include "yaml-cpp/yaml.h"
 
-
-jint native_setup(JNIEnv *env, jobject thiz) {
-    return -1;
+jstring list(JNIEnv *env, jobject thiz, jstring value) {
+    YAML::Emitter out;
+    out << YAML::BeginSeq;
+    const char *c_value = value == NULL ? NULL : env->GetStringUTFChars(value, NULL);
+    out << c_value;
+    if (value) {
+        env->ReleaseStringUTFChars(value, c_value);
+    }
+    return env->NewStringUTF(out.c_str());
 }
 
 static const JNINativeMethod sMethods[] = {
-//        {
-//                const_cast<char *>("native_setup"),
-//                const_cast<char *>("(Ljava/lang/String;)I"),
-//                reinterpret_cast<void *>(native_setup)
-//        },
+        {
+                const_cast<char *>("list"),
+                const_cast<char *>("(Ljava/lang/String;)Ljava/lang/String;"),
+                reinterpret_cast<void *>(list)
+        },
 
 };
 

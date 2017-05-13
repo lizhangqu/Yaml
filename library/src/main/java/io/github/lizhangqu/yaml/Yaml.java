@@ -9,4 +9,9 @@ import android.support.annotation.Keep;
  */
 @Keep
 public class Yaml {
+    static {
+        System.loadLibrary("yaml");
+    }
+
+    public static final native String list(String value);
 }

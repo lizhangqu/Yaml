@@ -6,6 +6,11 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Release")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -s")
 endif()
 
+#if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+# add_definitions(DENABLE_LOG)
+#endif()
+
+
 file(GLOB YAML_SOURCES ${PROJECT_SOURCE_DIR}/../../../../yaml-cpp/src/*.cpp)
 
 include_directories(
