@@ -3,17 +3,21 @@
 //
 
 #include "yaml_cpp.h"
-#include "yaml-cpp/yaml.h"
+#include "config.h"
 
 jstring list(JNIEnv *env, jobject thiz, jstring value) {
-    YAML::Emitter out;
-    out << YAML::BeginSeq;
-    const char *c_value = value == NULL ? NULL : env->GetStringUTFChars(value, NULL);
-    out << c_value;
-    if (value) {
-        env->ReleaseStringUTFChars(value, c_value);
-    }
-    return env->NewStringUTF(out.c_str());
+    yaml::Config *config;
+    config->SaveToStream();
+//    config.
+//    YAML::Emitter out;
+//    out << YAML::BeginSeq;
+//    const char *c_value = value == NULL ? NULL : env->GetStringUTFChars(value, NULL);
+//    out << c_value;
+//    if (value) {
+//        env->ReleaseStringUTFChars(value, c_value);
+//    }
+//    return env->NewStringUTF(out.c_str());
+    return env->NewStringUTF("");
 }
 
 static const JNINativeMethod sMethods[] = {

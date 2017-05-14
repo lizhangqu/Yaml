@@ -10,22 +10,30 @@ endif()
 # add_definitions(DENABLE_LOG)
 #endif()
 
-
-file(GLOB YAML_SOURCES ${PROJECT_SOURCE_DIR}/../../../../yaml-cpp/src/*.cpp)
-
 include_directories(
-  ${PROJECT_SOURCE_DIR}/../../../../yaml-cpp/include/
+  ${PROJECT_SOURCE_DIR}/include/ #jni source
+  ${PROJECT_SOURCE_DIR}/../../../../thirdparty/yaml-cpp/include/ #yaml-cpp
+  /usr/local/include #boost
   )
+
+# boost install
+# brew update
+# brew install boost
+# brew upgrade boost
+
+file(GLOB YAML_SOURCES
+  ${PROJECT_SOURCE_DIR}/../../../../thirdparty/yaml-cpp/src/*.cpp #yamp-cpp
+)
 
 add_library(yaml-cpp-static STATIC ${YAML_SOURCES})
 
+file(GLOB JNI_SOURCES
+  ${PROJECT_SOURCE_DIR}/*.cpp #jni source
+  ${PROJECT_SOURCE_DIR}/../../../../thirdparty/boost/filesystem/src/*.cpp #boost
+  ${PROJECT_SOURCE_DIR}/../../../../thirdparty/boost/system/src/*.cpp #boost
+)
 
-include_directories(
-  ${PROJECT_SOURCE_DIR}/include/
-  )
-
-file(GLOB_RECURSE YAML_JNI_SOURCES ${PROJECT_SOURCE_DIR}/*.cpp)
-add_library(yaml SHARED ${YAML_JNI_SOURCES})
+add_library(yaml SHARED ${JNI_SOURCES})
 
 target_link_libraries(yaml
   yaml-cpp-static

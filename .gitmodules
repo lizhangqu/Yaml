@@ -1,3 +1,9 @@
-[submodule "yaml-cpp"]
-	path = yaml-cpp
+[submodule "thirdparty/boost/filesystem"]
+	path = thirdparty/boost/filesystem
+	url = git@github.com:boostorg/filesystem.git
+[submodule "thirdparty/boost/system"]
+	path = thirdparty/boost/system
+	url = git@github.com:boostorg/system.git
+[submodule "thirdparty/yaml-cpp"]
+	path = thirdparty/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
