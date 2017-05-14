@@ -4,44 +4,44 @@
 //
 // 2011-4-6 Zou xu <zouivex@gmail.com>
 //
-#ifndef CONFIG_H_
-#define CONFIG_H_
+#ifndef YAML_H_
+#define YAML_H_
 
 #include <type_traits>
 #include <common.h>
 
 namespace yaml {
     // config item base class
-    class ConfigItem {
+    class YamlItem {
     public:
         enum ValueType {
             kNull, kScalar, kList, kMap
         };
 
-        ConfigItem() = default;  // null
-        virtual ~ConfigItem() = default;
+        YamlItem() = default;  // null
+        virtual ~YamlItem() = default;
 
         ValueType type() const { return type_; }
 
     protected:
-        ConfigItem(ValueType type) : type_(type) {}
+        YamlItem(ValueType type) : type_(type) {}
 
         ValueType type_ = kNull;
     };
 
-    class ConfigValue : public ConfigItem {
+    class YamlValue : public YamlItem {
     public:
-        ConfigValue() : ConfigItem(kScalar) {}
+        YamlValue() : YamlItem(kScalar) {}
 
-        ConfigValue(bool value);
+        YamlValue(bool value);
 
-        ConfigValue(int value);
+        YamlValue(int value);
 
-        ConfigValue(double value);
+        YamlValue(double value);
 
-        ConfigValue(const char *value);
+        YamlValue(const char *value);
 
-        ConfigValue(const std::string &value);
+        YamlValue(const std::string &value);
 
         // schalar value accessors
         bool GetBool(bool *value) const;
@@ -68,22 +68,22 @@ namespace yaml {
         std::string value_;
     };
 
-    class ConfigList : public ConfigItem {
+    class YamlList : public YamlItem {
     public:
-        using Sequence = std::vector<an<ConfigItem>>;
+        using Sequence = std::vector<an<YamlItem>>;
         using Iterator = Sequence::iterator;
 
-        ConfigList() : ConfigItem(kList) {}
+        YamlList() : YamlItem(kList) {}
 
-        an<ConfigItem> GetAt(size_t i) const;
+        an<YamlItem> GetAt(size_t i) const;
 
-        an<ConfigValue> GetValueAt(size_t i) const;
+        an<YamlValue> GetValueAt(size_t i) const;
 
-        bool SetAt(size_t i, an<ConfigItem> element);
+        bool SetAt(size_t i, an<YamlItem> element);
 
-        bool Insert(size_t i, an<ConfigItem> element);
+        bool Insert(size_t i, an<YamlItem> element);
 
-        bool Append(an<ConfigItem> element);
+        bool Append(an<YamlItem> element);
 
         bool Resize(size_t size);
 
@@ -100,20 +100,20 @@ namespace yaml {
     };
 
 // limitation: map keys have to be strings, preferably alphanumeric
-    class ConfigMap : public ConfigItem {
+    class YamlMap : public YamlItem {
     public:
-        using Map = std::map<std::string, an<ConfigItem>>;
+        using Map = std::map<std::string, an<YamlItem>>;
         using Iterator = Map::iterator;
 
-        ConfigMap() : ConfigItem(kMap) {}
+        YamlMap() : YamlItem(kMap) {}
 
         bool HasKey(const std::string &key) const;
 
-        an<ConfigItem> Get(const std::string &key) const;
+        an<YamlItem> Get(const std::string &key) const;
 
-        an<ConfigValue> GetValue(const std::string &key) const;
+        an<YamlValue> GetValue(const std::string &key) const;
 
-        bool Set(const std::string &key, an<ConfigItem> element);
+        bool Set(const std::string &key, an<YamlItem> element);
 
         bool Clear();
 
@@ -125,24 +125,24 @@ namespace yaml {
         Map map_;
     };
 
-    class ConfigData;
+    class YamlData;
 
-    class ConfigListEntryRef;
+    class YamlListEntryRef;
 
-    class ConfigMapEntryRef;
+    class YamlMapEntryRef;
 
-    class ConfigItemRef {
+    class YamlItemRef {
     public:
-        ConfigItemRef(const an<ConfigData> &data) : data_(data) {
+        YamlItemRef(const an<YamlData> &data) : data_(data) {
         }
 
-        operator an<ConfigItem>() const {
+        operator an<YamlItem>() const {
             return GetItem();
         }
 
-        ConfigListEntryRef operator[](size_t index);
+        YamlListEntryRef operator[](size_t index);
 
-        ConfigMapEntryRef operator[](const std::string &key);
+        YamlMapEntryRef operator[](const std::string &key);
 
         bool IsNull() const;
 
@@ -160,14 +160,14 @@ namespace yaml {
 
         std::string ToString() const;
 
-        an<ConfigList> AsList();
+        an<YamlList> AsList();
 
-        an<ConfigMap> AsMap();
+        an<YamlMap> AsMap();
 
         void Clear();
 
         // list
-        bool Append(an<ConfigItem> item);
+        bool Append(an<YamlItem> item);
 
         size_t size() const;
 
@@ -179,104 +179,104 @@ namespace yaml {
         void set_modified();
 
     protected:
-        virtual an<ConfigItem> GetItem() const = 0;
+        virtual an<YamlItem> GetItem() const = 0;
 
-        virtual void SetItem(an<ConfigItem> item) = 0;
+        virtual void SetItem(an<YamlItem> item) = 0;
 
-        an<ConfigData> data_;
+        an<YamlData> data_;
     };
 
     namespace {
 
         template<class T>
-        an<ConfigItem> AsConfigItem(const T &x, const std::false_type &) {
-            return New<ConfigValue>(x);
+        an<YamlItem> AsYamlItem(const T &x, const std::false_type &) {
+            return New<YamlValue>(x);
         };
 
         template<class T>
-        an<ConfigItem> AsConfigItem(const T &x, const std::true_type &) {
+        an<YamlItem> AsYamlItem(const T &x, const std::true_type &) {
             return x;
         };
 
     }  // namespace
 
-    class ConfigListEntryRef : public ConfigItemRef {
+    class YamlListEntryRef : public YamlItemRef {
     public:
-        ConfigListEntryRef(an<ConfigData> data,
-                           an<ConfigList> list, size_t index)
-                : ConfigItemRef(data), list_(list), index_(index) {
+        YamlListEntryRef(an<YamlData> data,
+                           an<YamlList> list, size_t index)
+                : YamlItemRef(data), list_(list), index_(index) {
         }
 
         template<class T>
-        ConfigListEntryRef &operator=(const T &x) {
-            SetItem(AsConfigItem(x, std::is_convertible<T, an<ConfigItem>>()));
+        YamlListEntryRef &operator=(const T &x) {
+            SetItem(AsYamlItem(x, std::is_convertible<T, an<YamlItem>>()));
             return *this;
         }
 
     protected:
-        an<ConfigItem> GetItem() const {
+        an<YamlItem> GetItem() const {
             return list_->GetAt(index_);
         }
 
-        void SetItem(an<ConfigItem> item) {
+        void SetItem(an<YamlItem> item) {
             list_->SetAt(index_, item);
             set_modified();
         }
 
     private:
-        an<ConfigList> list_;
+        an<YamlList> list_;
         size_t index_;
     };
 
-    class ConfigMapEntryRef : public ConfigItemRef {
+    class YamlMapEntryRef : public YamlItemRef {
     public:
-        ConfigMapEntryRef(an<ConfigData> data,
-                          an<ConfigMap> map, const std::string &key)
-                : ConfigItemRef(data), map_(map), key_(key) {
+        YamlMapEntryRef(an<YamlData> data,
+                          an<YamlMap> map, const std::string &key)
+                : YamlItemRef(data), map_(map), key_(key) {
         }
 
         template<class T>
-        ConfigMapEntryRef &operator=(const T &x) {
-            SetItem(AsConfigItem(x, std::is_convertible<T, an<ConfigItem>>()));
+        YamlMapEntryRef &operator=(const T &x) {
+            SetItem(AsYamlItem(x, std::is_convertible<T, an<YamlItem>>()));
             return *this;
         }
 
     protected:
-        an<ConfigItem> GetItem() const {
+        an<YamlItem> GetItem() const {
             return map_->Get(key_);
         }
 
-        void SetItem(an<ConfigItem> item) {
+        void SetItem(an<YamlItem> item) {
             map_->Set(key_, item);
             set_modified();
         }
 
     private:
-        an<ConfigMap> map_;
+        an<YamlMap> map_;
         std::string key_;
     };
 
-    inline ConfigListEntryRef ConfigItemRef::operator[](size_t index) {
-        return ConfigListEntryRef(data_, AsList(), index);
+    inline YamlListEntryRef YamlItemRef::operator[](size_t index) {
+        return YamlListEntryRef(data_, AsList(), index);
     }
 
-    inline ConfigMapEntryRef ConfigItemRef::operator[](const std::string &key) {
-        return ConfigMapEntryRef(data_, AsMap(), key);
+    inline YamlMapEntryRef YamlItemRef::operator[](const std::string &key) {
+        return YamlMapEntryRef(data_, AsMap(), key);
     }
 
-// Config class
+// Yaml class
 
-    class Config : public ConfigItemRef {
+    class Yaml : public YamlItemRef {
     public:
-        // CAVEAT: Config instances created without argument will NOT
+        // CAVEAT: Yaml instances created without argument will NOT
         // be managed by ConfigComponent
-        Config();
+        Yaml();
 
-        virtual ~Config();
+        virtual ~Yaml();
 
-        // instances of Config with identical file_name share a copy of config data
+        // instances of Yaml with identical file_name share a copy of config data
         // that could be reloaded by ConfigComponent once notified changes to the file
-        explicit Config(const std::string &file_name);
+        explicit Yaml(const std::string &file_name);
 
         bool LoadFromStream(std::istream &stream);
 
@@ -303,13 +303,13 @@ namespace yaml {
 
         bool GetString(const std::string &key, std::string *value);
 
-        an<ConfigItem> GetItem(const std::string &key);
+        an<YamlItem> GetItem(const std::string &key);
 
-        an<ConfigValue> GetValue(const std::string &key);
+        an<YamlValue> GetValue(const std::string &key);
 
-        an<ConfigList> GetList(const std::string &key);
+        an<YamlList> GetList(const std::string &key);
 
-        an<ConfigMap> GetMap(const std::string &key);
+        an<YamlMap> GetMap(const std::string &key);
 
         // setters
         bool SetBool(const std::string &key, bool value);
@@ -323,20 +323,20 @@ namespace yaml {
         bool SetString(const std::string &key, const std::string &value);
 
         // setter for adding / replacing items to the tree
-        bool SetItem(const std::string &key, an<ConfigItem> item);
+        bool SetItem(const std::string &key, an<YamlItem> item);
 
         template<class T>
-        Config &operator=(const T &x) {
-            SetItem(AsConfigItem(x, std::is_convertible<T, an<ConfigItem>>()));
+        Yaml &operator=(const T &x) {
+            SetItem(AsYamlItem(x, std::is_convertible<T, an<YamlItem>>()));
             return *this;
         }
 
     protected:
-        an<ConfigItem> GetItem() const;
+        an<YamlItem> GetItem() const;
 
-        void SetItem(an<ConfigItem> item);
+        void SetItem(an<YamlItem> item);
     };
 
 }  // namespace yaml
 
-#endif  // CONFIG_H_
+#endif  // YAML_H_

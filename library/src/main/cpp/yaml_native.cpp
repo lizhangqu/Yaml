@@ -2,22 +2,18 @@
 // Created by 李樟取 on 2017/5/13.
 //
 
-#include "yaml_cpp.h"
-#include "config.h"
+#include <sstream>
+#include "yaml_native.h"
+#include "yaml.h"
 
 jstring list(JNIEnv *env, jobject thiz, jstring value) {
-    yaml::Config *config;
-    config->SaveToStream();
-//    config.
-//    YAML::Emitter out;
-//    out << YAML::BeginSeq;
-//    const char *c_value = value == NULL ? NULL : env->GetStringUTFChars(value, NULL);
-//    out << c_value;
-//    if (value) {
-//        env->ReleaseStringUTFChars(value, c_value);
-//    }
-//    return env->NewStringUTF(out.c_str());
-    return env->NewStringUTF("");
+    yaml::Yaml yaml;
+    yaml.SetBool("flag", true);
+    yaml.SetString("str", "just a test");
+    yaml.SetInt("num", 9);
+    std::ostringstream ostringstream;
+    yaml.SaveToStream(ostringstream);
+    return env->NewStringUTF(ostringstream.str().c_str());
 }
 
 static const JNINativeMethod sMethods[] = {
